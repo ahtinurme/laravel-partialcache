@@ -30,6 +30,11 @@
             "Spatie\\PartialCache\\": "src"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Spatie\\PartialCache\\Tests\\": "tests/"
+        }
+    },
     "extra": {
         "laravel": {
             "providers": [
