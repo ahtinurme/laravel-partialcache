@@ -3,10 +3,10 @@
 namespace Spatie\PartialCache\Tests;
 
 use Spatie\PartialCache\Tests\TestCase;
+use Spatie\PartialCache\PartialCache;
 
 class PartialCacheTest extends TestCase
 {
-
     /**
      * @test
      */
@@ -20,7 +20,25 @@ class PartialCacheTest extends TestCase
      */
     public function i_will_not_get_any_cache_if_the_cache_is_disabled()
     {
-        $this->markTestIncomplete('todo');
+        config(['partialcache.enabled' => false]);
+
+        $view = $this->app->make(\Illuminate\Contracts\View\Factory::class);
+
+        $cache = \Mockery::mock(\Illuminate\Contracts\Cache\Repository::class);
+        $cache->shouldNotHaveReceived('remember');
+        $cache->shouldNotHaveReceived('rememberForever');
+        $cacheManager = $this->app->make(\Illuminate\Contracts\Cache\Factory::class);
+        $config = $this->app->make(\Illuminate\Contracts\Config\Repository::class);
+
+        $view->addLocation(__DIR__.'/fixtures');
+
+        $partialcache = new PartialCache($view, $cache, $cacheManager, $config);
+
+        $result = $partialcache->cache([], 'partialcachetestview');
+        $this->assertInternalType('string', $result);
+
+        $this->assertStringStartsWith('Start', $result);
+        $this->assertStringEndsWith('End', $result);
     }
 
     /**
@@ -28,7 +46,20 @@ class PartialCacheTest extends TestCase
      */
     public function i_will_get_the_view_if_the_cache_doesnt_exist()
     {
-        $this->markTestIncomplete('todo');
+        $view = $this->app->make(\Illuminate\Contracts\View\Factory::class);
+        $cache = $this->app->make(\Illuminate\Contracts\Cache\Repository::class);
+        $cacheManager = $this->app->make(\Illuminate\Contracts\Cache\Factory::class);
+        $config = $this->app->make(\Illuminate\Contracts\Config\Repository::class);
+
+        $view->addLocation(__DIR__.'/fixtures');
+
+        $partialcache = new PartialCache($view, $cache, $cacheManager, $config);
+
+        $result = $partialcache->cache([], 'partialcachetestview');
+        $this->assertInternalType('string', $result);
+
+        $this->assertStringStartsWith('Start', $result);
+        $this->assertStringEndsWith('End', $result);
     }
 
     /**
@@ -36,7 +67,25 @@ class PartialCacheTest extends TestCase
      */
     public function i_will_remember_the_cache_for_the_provided_minuts()
     {
-        $this->markTestIncomplete('todo');
+        $testResult = str_random();
+        $minuts = mt_rand(10, 100);
+
+        $view = $this->app->make(\Illuminate\Contracts\View\Factory::class);
+
+        $cache = \Mockery::mock(\Illuminate\Contracts\Cache\Repository::class);
+        $cache->shouldNotHaveReceived('rememberForever');
+        $cache->shouldReceive('tags')->andReturnSelf();
+        $cache->shouldReceive('remember')->once()->with(\Mockery::any(), $minuts, \Mockery::any())->andReturn($testResult);
+
+        $cacheManager = $this->app->make(\Illuminate\Contracts\Cache\Factory::class);
+        $config = $this->app->make(\Illuminate\Contracts\Config\Repository::class);
+
+        $view->addLocation(__DIR__.'/fixtures');
+
+        $partialcache = new PartialCache($view, $cache, $cacheManager, $config);
+        $result = $partialcache->cache([], 'partialcachetestview', null, $minuts);
+        $this->assertEquals($testResult, $result);
+
     }
 
     /**
@@ -44,7 +93,23 @@ class PartialCacheTest extends TestCase
      */
     public function i_will_rember_the_cache_forever_if_wanted()
     {
-        $this->markTestIncomplete('todo');
+        $testResult = str_random();
+
+        $view = $this->app->make(\Illuminate\Contracts\View\Factory::class);
+
+        $cache = \Mockery::mock(\Illuminate\Contracts\Cache\Repository::class);
+        $cache->shouldNotHaveReceived('remember');
+        $cache->shouldReceive('tags')->andReturnSelf();
+        $cache->shouldReceive('rememberForever')->once()->andReturn($testResult);
+
+        $cacheManager = $this->app->make(\Illuminate\Contracts\Cache\Factory::class);
+        $config = $this->app->make(\Illuminate\Contracts\Config\Repository::class);
+
+        $view->addLocation(__DIR__.'/fixtures');
+
+        $partialcache = new PartialCache($view, $cache, $cacheManager, $config);
+        $result = $partialcache->cache([], 'partialcachetestview');
+        $this->assertEquals($testResult, $result);
     }
 
     /**
