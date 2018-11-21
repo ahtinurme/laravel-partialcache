@@ -181,6 +181,14 @@ class PartialCacheTest extends TestCase
     /**
      * @test
      */
+    public function i_will_forget_the_cache_if_wanted_with_tags()
+    {
+        $this->markTestIncomplete('todo');
+    }
+
+    /**
+     * @test
+     */
     public function i_will_flush_the_cache()
     {
         $this->markTestIncomplete('todo');
