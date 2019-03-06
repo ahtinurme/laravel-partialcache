@@ -1,5 +1,5 @@
 {
-    "name": "spatie/laravel-partialcache",
+    "name": "ahtinurme/laravel-partialcache",
     "description": "Blade directive to cache rendered partials in laravel",
     "keywords": [
         "spatie",
