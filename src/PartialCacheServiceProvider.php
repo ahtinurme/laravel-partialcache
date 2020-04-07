@@ -3,6 +3,7 @@
 namespace Spatie\PartialCache;
 
 use Blade;
+
 use Illuminate\Support\ServiceProvider;
 
 class PartialCacheServiceProvider extends ServiceProvider
@@ -23,8 +24,8 @@ class PartialCacheServiceProvider extends ServiceProvider
                 $expression = substr($expression, 1, -1);
             }
 
-            return "<?php echo app()->make('partialcache')
-                ->cache(array_except(get_defined_vars(), ['__data', '__path']), {$expression}); ?>";
+            return "<?php use Illuminate\Support\Arr;
+             echo app()->make('partialcache')->cache(Arr::except(get_defined_vars(), ['__data', '__path']), {$expression}); ?>";
         });
     }
 
